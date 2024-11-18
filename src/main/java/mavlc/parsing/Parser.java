@@ -32,9 +32,9 @@ import static mavlc.syntax.expression.Compare.Comparison.*;
 /*
  * EiCB group number: 115
  * Names and matriculation numbers of all group members:
- * Mykyta Balandin
- * Saba Nagervadze
- * Hlib Strochkovskyi
+ * Saba Nagervadze 2981541
+ * Mykyta Balandin 2383107
+ * Hlib Strochkovskyi 2243784
  */
 
 /**
