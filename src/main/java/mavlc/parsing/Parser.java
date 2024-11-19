@@ -309,8 +309,7 @@ public final class Parser {
 		if (currentToken.type != LPAREN) {
 			s = parseAssign(name, location);
 		} else {
-			CallExpression call = parseCall(name, location);
-			s = new CallStatement(location, call);
+			s = new CallStatement(location, parseCall(name, location));
 		}
 
 		accept(SEMICOLON);
@@ -321,6 +320,7 @@ public final class Parser {
 		LeftHandIdentifier lhs = new LeftHandIdentifier(location, name);
 		accept(ASSIGN);
 		Expression value = parseExpr();
+
 		return new VariableAssignment(location, lhs, value);
 	}
 
@@ -329,14 +329,11 @@ public final class Parser {
 		List<Expression> args = new ArrayList<>();
 
 		if(currentToken.type != RPAREN) {
-			do {
-				args.add(parseExpr());
-				if (currentToken.type == COMMA) {
-					accept(COMMA);
-				} else {
-					break;
-				}
-			} while (true);
+            args.add(parseExpr());
+            while(currentToken.type == COMMA){
+                acceptIt();
+                args.add(parseExpr());
+            }
 		}
 
 		accept(RPAREN);
@@ -454,9 +451,9 @@ public final class Parser {
 		Expression cond = parseOr();
 		if(currentToken.type == QMARK) {
 			acceptIt();
-			Expression trueCase = parseExpr();
+			Expression trueCase = parseOr();
 			accept(COLON);
-			Expression falseCase = parseExpr();
+			Expression falseCase = parseOr();
 			return new SelectExpression(location, cond, trueCase, falseCase);
 		}
 
@@ -501,7 +498,7 @@ public final class Parser {
 
 		Expression x = parseAddSub();
 
-		if(currentToken.type == CMPEQ || currentToken.type == CMPNE
+		while(currentToken.type == CMPEQ || currentToken.type == CMPNE
 				|| currentToken.type == LANGLE || currentToken.type == CMPLE
 				|| currentToken.type == RANGLE || currentToken.type == CMPGE) {
 
@@ -509,19 +506,13 @@ public final class Parser {
 			acceptIt();
 			Expression y = parseAddSub();
 
-            return switch (op.type) {
-                case CMPEQ -> //equal
-                        new Compare(location, x, y, EQUAL);
-                case CMPNE -> //not equal
-                        new Compare(location, x, y, NOT_EQUAL);
-                case LANGLE -> //less
-                        new Compare(location, x, y, LESS);
-                case CMPLE -> //less or equal
-                        new Compare(location, x, y, LESS_EQUAL);
-                case RANGLE -> //greater
-                        new Compare(location, x, y, GREATER);
-                case CMPGE -> //greater or equal
-                        new Compare(location, x, y, GREATER_EQUAL);
+            x = switch (op.type) {
+                case CMPEQ -> new Compare(location, x, y, EQUAL); //equal
+                case CMPNE -> new Compare(location, x, y, NOT_EQUAL); //not equal
+                case LANGLE -> new Compare(location, x, y, LESS); //less
+                case CMPLE -> new Compare(location, x, y, LESS_EQUAL); //less or equal
+                case RANGLE -> new Compare(location, x, y, GREATER); //greater
+                case CMPGE -> new Compare(location, x, y, GREATER_EQUAL); //greater or equal
                 default -> throw new SyntaxError(op, CMPEQ, CMPNE, LANGLE, CMPLE, RANGLE, CMPGE);
             };
 		}
@@ -530,21 +521,21 @@ public final class Parser {
 	}
 
 	private Expression parseAddSub() {
-	SourceLocation location = currentToken.sourceLocation;
+        SourceLocation location = currentToken.sourceLocation;
 
-	Expression x = parseMulDiv();
+        Expression x = parseMulDiv();
 
-	while(currentToken.type == ADD || currentToken.type == SUB) {
-		Token op = currentToken;
-		acceptIt();
-		if(op.type == ADD) {
-			x = new Addition(location, x, parseMulDiv());
-		} else {
-			x = new Subtraction(location, x, parseMulDiv());
-		}
-	}
+        while(currentToken.type == ADD || currentToken.type == SUB) {
+            Token op = currentToken;
+            acceptIt();
+            if(op.type == ADD) {
+                x = new Addition(location, x, parseMulDiv());
+            } else {
+                x = new Subtraction(location, x, parseMulDiv());
+            }
+        }
 
-	return x;
+        return x;
 	}
 
 	private Expression parseMulDiv() {
@@ -713,10 +704,10 @@ public final class Parser {
 
 		if(currentToken.type == ID) {
 			String name = accept(ID);
-			if(currentToken.type != LPAREN) {
-				return new IdentifierReference(location, name);
+			if(currentToken.type == LPAREN) {
+                return parseCall(name, location);
 			}
-            return parseCall(name, location);
+            return new IdentifierReference(location, name);
 		}
 
 		if(currentToken.type == LPAREN) {
