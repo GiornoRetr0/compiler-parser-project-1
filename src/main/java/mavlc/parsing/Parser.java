@@ -25,6 +25,7 @@ import mavlc.syntax.type.*;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import java.util.Set;
 
 import static mavlc.parsing.Token.TokenType.*;
 import static mavlc.syntax.expression.Compare.Comparison.*;
@@ -146,19 +147,12 @@ public final class Parser {
 	private RecordElementDeclaration parseRecordElementDeclaration() {
 		SourceLocation location = currentToken.sourceLocation;
 
-		boolean isVariable;
-		switch(currentToken.type) {
-			case VAL:
-				accept(VAL);
-				isVariable = false;
-				break;
-			case VAR:
-				accept(VAR);
-				isVariable = true;
-				break;
-			default:
-				throw new SyntaxError(currentToken, VAL, VAR);
-		}
+		boolean isVariable = true;
+		if (currentToken.type == VAL) {
+			acceptIt();
+			isVariable = false;
+		} else accept(VAR);
+
 		TypeSpecifier<?> typeSpecifier = parseTypeSpecifier();
 		String name = accept(ID);
 		accept(SEMICOLON);
@@ -169,19 +163,12 @@ public final class Parser {
 	private IteratorDeclaration parseIteratorDeclaration() {
 		SourceLocation location = currentToken.sourceLocation;
 
-		boolean isVariable;
-		switch(currentToken.type) {
-			case VAL:
-				accept(VAL);
-				isVariable = false;
-				break;
-			case VAR:
-				accept(VAR);
-				isVariable = true;
-				break;
-			default:
-				throw new SyntaxError(currentToken, VAL, VAR);
-		}
+		boolean isVariable = true;
+		if(currentToken.type == VAL) {
+			accept(VAL);
+			isVariable = false;
+		} else accept(VAR);
+
 		TypeSpecifier<?> typeSpecifier = parseTypeSpecifier();
 		String name = accept(ID);
 		return new IteratorDeclaration(location, name, typeSpecifier, isVariable);
@@ -317,7 +304,23 @@ public final class Parser {
 	}
 
 	private VariableAssignment parseAssign(String name, SourceLocation location) {
-		LeftHandIdentifier lhs = new LeftHandIdentifier(location, name);
+
+		StringBuilder sb = new StringBuilder(name);
+		if(currentToken.type == LBRACKET) {
+			sb.append(accept(LBRACKET));
+			sb.append(parseExpr().toString());
+			sb.append(accept(RBRACKET));
+			if(currentToken.type == LBRACKET) {
+				sb.append(accept(LBRACKET));
+				sb.append(parseExpr().toString());
+				sb.append(accept(RBRACKET));
+			}
+		}else if(currentToken.type == AT) {
+			sb.append(accept(AT));
+			sb.append(accept(ID));
+		}
+
+		LeftHandIdentifier lhs = new LeftHandIdentifier(location, sb.toString());
 		accept(ASSIGN);
 		Expression value = parseExpr();
 
@@ -379,13 +382,12 @@ public final class Parser {
 		Expression condition = parseExpr();
 		accept(RPAREN);
 		Statement thenStatement = parseStatement();
-		Statement elseStatement = null;
-		if(currentToken.type == ELSE) {
-			accept(ELSE);
-			elseStatement = parseStatement();
+		if (currentToken.type == ELSE) {
+			acceptIt();
+			Statement elseStatement = parseStatement();
+			return new IfStatement(location, condition, thenStatement, elseStatement);
 		}
-
-		return new IfStatement(location, condition, thenStatement, elseStatement);
+		return new IfStatement(location, condition, thenStatement);
 	}
 
 	private SwitchStatement parseSwitch() {
@@ -485,7 +487,7 @@ public final class Parser {
 	private Expression parseNot() {
 		SourceLocation location = currentToken.sourceLocation;
 
-		if(currentToken.type == NOT) {
+		if (currentToken.type == NOT) {
 			acceptIt();
 			return new Not(location, parseCompare());
 		}
@@ -498,23 +500,20 @@ public final class Parser {
 
 		Expression x = parseAddSub();
 
-		while(currentToken.type == CMPEQ || currentToken.type == CMPNE
-				|| currentToken.type == LANGLE || currentToken.type == CMPLE
-				|| currentToken.type == RANGLE || currentToken.type == CMPGE) {
-
-			Token op = currentToken;
+		while (Set.of(RANGLE, LANGLE, CMPGE, CMPLE, CMPNE, CMPEQ).contains(currentToken.type)) {
+			Token.TokenType type = currentToken.type;
+			Compare.Comparison comp;
 			acceptIt();
-			Expression y = parseAddSub();
-
-            x = switch (op.type) {
-                case CMPEQ -> new Compare(location, x, y, EQUAL); //equal
-                case CMPNE -> new Compare(location, x, y, NOT_EQUAL); //not equal
-                case LANGLE -> new Compare(location, x, y, LESS); //less
-                case CMPLE -> new Compare(location, x, y, LESS_EQUAL); //less or equal
-                case RANGLE -> new Compare(location, x, y, GREATER); //greater
-                case CMPGE -> new Compare(location, x, y, GREATER_EQUAL); //greater or equal
-                default -> throw new SyntaxError(op, CMPEQ, CMPNE, LANGLE, CMPLE, RANGLE, CMPGE);
-            };
+			switch (type) {
+				case LANGLE -> comp = LESS;
+				case RANGLE -> comp = GREATER;
+				case CMPGE -> comp = GREATER_EQUAL;
+				case CMPLE -> comp = LESS_EQUAL;
+				case CMPEQ -> comp = EQUAL;
+				case CMPNE -> comp = NOT_EQUAL;
+				default -> throw new SyntaxError(currentToken, LANGLE, RANGLE, CMPNE, CMPLE, CMPGE, CMPEQ);
+			}
+			x = new Compare(location, x, parseCompare(), comp);
 		}
 
 		return x;
@@ -526,11 +525,11 @@ public final class Parser {
         Expression x = parseMulDiv();
 
         while(currentToken.type == ADD || currentToken.type == SUB) {
-            Token op = currentToken;
-            acceptIt();
-            if(op.type == ADD) {
+            if(currentToken.type == ADD) {
+				acceptIt();
                 x = new Addition(location, x, parseMulDiv());
             } else {
+				acceptIt();
                 x = new Subtraction(location, x, parseMulDiv());
             }
         }
@@ -544,11 +543,11 @@ public final class Parser {
 		Expression x = parseUnaryMinus();
 
 		while(currentToken.type == MULT || currentToken.type == DIV) {
-			Token op = currentToken;
-			acceptIt();
-			if(op.type == MULT) {
+			if(currentToken.type == MULT) {
+				acceptIt();
 				x = new Multiplication(location, x, parseUnaryMinus());
 			} else {
+				acceptIt();
 				x = new Division(location, x, parseUnaryMinus());
 			}
 		}
@@ -557,12 +556,8 @@ public final class Parser {
 	}
 
 	private Expression parseUnaryMinus() {
-		SourceLocation location = currentToken.sourceLocation;
+		if(currentToken.type == SUB) acceptIt();
 
-		if(currentToken.type == SUB) {
-			acceptIt();
-			return new UnaryMinus(location, parseExponentiation());
-		}
 		return parseExponentiation();
 	}
 
@@ -573,7 +568,7 @@ public final class Parser {
 
 		if(currentToken.type == EXP) {
 			acceptIt();
-			return new Exponentiation(location, left, parseExponentiation());
+			return new Exponentiation(location, left, parseDotProd());
 		}
 
 		return left;
@@ -602,12 +597,7 @@ public final class Parser {
 	}
 
 	private Expression parseTranspose() {
-		SourceLocation location = currentToken.sourceLocation;
-
-		if(currentToken.type == TRANSPOSE) {
-			acceptIt();
-			return new MatrixTranspose(location, parseDim());
-		}
+		if(currentToken.type == TRANSPOSE) acceptIt();
 
 		return parseDim();
 	}

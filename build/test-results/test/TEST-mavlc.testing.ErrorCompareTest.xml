@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="mavlc.testing.ErrorCompareTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2024-11-19T19:15:19" hostname="Sabas-MacBook-Air.local" time="0.028">
+<testsuite name="mavlc.testing.ErrorCompareTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2024-11-19T20:29:57" hostname="Sabas-MacBook-Air.local" time="0.027">
   <properties/>
-  <testcase name="test[p1_public/task_6/return_err_1]" classname="mavlc.testing.ErrorCompareTest" time="0.011"/>
+  <testcase name="test[p1_public/task_6/return_err_1]" classname="mavlc.testing.ErrorCompareTest" time="0.01"/>
   <testcase name="test[p1_public/task_4/bool_err_1]" classname="mavlc.testing.ErrorCompareTest" time="0.008"/>
-  <testcase name="test[p1_public/task_2/arith_err_1]" classname="mavlc.testing.ErrorCompareTest" time="0.009"/>
+  <testcase name="test[p1_public/task_2/arith_err_1]" classname="mavlc.testing.ErrorCompareTest" time="0.008"/>
   <system-out><![CDATA[=== Running test case p1_public/task_6/return_err_1 ===
 
 
