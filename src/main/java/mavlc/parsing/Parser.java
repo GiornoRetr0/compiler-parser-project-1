@@ -136,7 +136,7 @@ public final class Parser {
 		accept(RECORD);
 		String name = accept(ID);
 		accept(LBRACE);
-		List<RecordElementDeclaration> elements	= new ArrayList<>();
+		List<RecordElementDeclaration> elements = new ArrayList<>();
 		while(currentToken.type != RBRACE)
 			elements.add(parseRecordElementDeclaration());
 		accept(RBRACE);
@@ -556,7 +556,12 @@ public final class Parser {
 	}
 
 	private Expression parseUnaryMinus() {
-		if(currentToken.type == SUB) acceptIt();
+		SourceLocation location = currentToken.sourceLocation;
+
+		if(currentToken.type == SUB){
+			acceptIt();
+			return new UnaryMinus(location, parseExponentiation());
+		}
 
 		return parseExponentiation();
 	}
