@@ -131,6 +131,19 @@ public final class Parser {
 		return new FormalParameter(location, name, typeSpecifier);
 	}
 
+	/**
+	 * <pre>
+	 * Task 1.7
+	 * Parses record type declarations following the grammar rule:
+	 * recordTypeDecl ::= 'record' ID '{' recordElemDecl+ '}'
+	 *
+	 * Parses a record type declaration consisting of an identifier and one or more 
+	 * record element declarations enclosed in curly braces.
+	 *
+	 * @return RecordTypeDeclaration AST node representing the parsed record type declaration
+	 * @throws SyntaxError if the input does not conform to the grammar
+	 * </pre>
+	 */
 	private RecordTypeDeclaration parseRecordTypeDeclaration() {
 		SourceLocation location = currentToken.sourceLocation;
 		accept(RECORD);
@@ -144,6 +157,18 @@ public final class Parser {
 		return new RecordTypeDeclaration(location, name, elements);
 	}
 
+	/**
+	 * <pre>
+	 * Task 1.7
+	 * Parses record element declarations following the grammar rule:
+	 * recordElemDecl ::= ( 'var' | 'val' ) type ID ';'
+	 *
+	 * Parses variable or value declarations within a record type definition.
+	 *
+	 * @return RecordElementDeclaration AST node representing the parsed record element
+	 * @throws SyntaxError if the input does not conform to the grammar
+	 * </pre>
+	 */
 	private RecordElementDeclaration parseRecordElementDeclaration() {
 		SourceLocation location = currentToken.sourceLocation;
 
@@ -251,6 +276,16 @@ public final class Parser {
         };
 	}
 
+	/**
+	 * <pre>
+	 * Task 1.1
+	 * Parses a value definition according to the grammar rule:
+	 * valueDef ::= 'val' type ID '=' expr ';'
+	 *
+	 * @return ValueDefinition AST node representing the parsed value definition
+	 * @throws SyntaxError if the input does not conform to the expected grammar
+	 * </pre>
+	 */
 	private ValueDefinition parseValueDef() {
 
 		SourceLocation location = currentToken.sourceLocation;
@@ -265,6 +300,16 @@ public final class Parser {
 		return new ValueDefinition(location, typeSpecifier, name, value);
 	}
 
+	/**
+	 * <pre>
+	 * Task 1.1
+	 * Parses a variable declaration following the grammar rule:
+	 * varDecl ::= 'var' type ID ';'
+	 *
+	 * @return VarDecl AST node representing the variable declaration
+	 * @throws SyntaxError if the input does not conform to the grammar
+	 * </pre>
+	 */
 	private VariableDeclaration parseVarDecl() {
 
 		SourceLocation location = currentToken.sourceLocation;
@@ -277,6 +322,16 @@ public final class Parser {
 		return new VariableDeclaration(location, typeSpecifier, name);
 	}
 
+	/**
+	 * <pre>
+	 * Task 1.6
+	 * Parses a return statement following the grammar rule:
+	 * return ::= 'return' expr ';'
+	 *
+	 * @return Return AST node representing the parsed return statement
+	 * @throws SyntaxError if the input does not conform to the grammar
+	 * </pre>
+	 */
 	private ReturnStatement parseReturn() {
 		SourceLocation location = currentToken.sourceLocation;
 
@@ -287,6 +342,16 @@ public final class Parser {
 		return new ReturnStatement(location, value);
 	}
 
+	/**
+	 * <pre>
+	 * Task 1.6
+	 * Parses an assignment or function call following the grammar rule:
+	 * assignOrCall ::= ID ( assign | call) ';'
+	 *
+	 * @return Statement AST node representing either an Assignment or Call
+	 * @throws SyntaxError if the input does not conform to the grammar
+	 * </pre>
+	 */
 	private Statement parseAssignOrCall() {
 		SourceLocation location = currentToken.sourceLocation;
 
@@ -303,6 +368,16 @@ public final class Parser {
 		return s;
 	}
 
+	/**
+	 * <pre>
+	 * Task 1.1
+	 * Parses an assignment statement following the grammar rule:
+	 * assign ::= target '=' expr ';'
+	 *
+	 * @return Assignment AST node representing the parsed assignment statement
+	 * @throws SyntaxError if the input does not conform to the grammar
+	 * </pre>
+	 */
 	private VariableAssignment parseAssign(String name, SourceLocation location) {
 
 		StringBuilder sb = new StringBuilder(name);
@@ -327,6 +402,20 @@ public final class Parser {
 		return new VariableAssignment(location, lhs, value);
 	}
 
+	/**
+	 * <pre>
+	 * Task 1.6
+	 * Parses function calls following the grammar rule:
+	 * call ::= '(' ( expr ( ',' expr )* )? ')'
+	 *
+	 * Parses function arguments as a comma-separated list of expressions.
+	 * 
+	 * @param name Name of the function being called
+	 * @param location Source location of the function call
+	 * @return CallExpression AST node representing the parsed function call
+	 * @throws SyntaxError if the input does not conform to the grammar
+	 * </pre>
+	 */
 	private CallExpression parseCall(String name, SourceLocation location) {
 		accept(LPAREN);
 		List<Expression> args = new ArrayList<>();
@@ -374,6 +463,18 @@ public final class Parser {
 		return new ForEachLoop(location, param, struct, parseStatement());
 	}
 
+	/**
+	 * <pre>
+	 * Task 1.3
+	 * Parses if statements following the grammar rule:
+	 * if ::= 'if' '(' expr ')' statement ( 'else' statement )?
+	 *
+	 * Parses conditional statements with optional else clause.
+	 *
+	 * @return IfStatement AST node representing the parsed if statement
+	 * @throws SyntaxError if the input does not conform to the grammar
+	 * </pre>
+	 */
 	private IfStatement parseIf() {
 		SourceLocation location = currentToken.sourceLocation;
 
@@ -447,6 +548,16 @@ public final class Parser {
 		return parseSelect();
 	}
 
+	/**
+	 * <pre>
+	 * Task 1.5
+	 * Parses ternary conditional expressions following the grammar rule:
+	 * select ::= or ('?' or ':' or)?
+	 *
+	 * @return Expression AST node representing the parsed selection expression
+	 * @throws SyntaxError if the input does not conform to the grammar
+	 * </pre>
+	 */
 	private Expression parseSelect() {
 		SourceLocation location = currentToken.sourceLocation;
 
@@ -484,6 +595,16 @@ public final class Parser {
 		return x;
 	}
 
+	/**
+	 * <pre>
+	 * Task 1.2
+	 * Parses logical NOT expressions following the grammar rule:
+	 * not ::= '!' ? compare
+	 *
+	 * @return Expression AST node representing the parsed NOT expression
+	 * @throws SyntaxError if the input does not conform to the grammar
+	 * </pre>
+	 */
 	private Expression parseNot() {
 		SourceLocation location = currentToken.sourceLocation;
 
@@ -495,6 +616,16 @@ public final class Parser {
 		return parseCompare();
 	}
 
+	/**
+	 * <pre>
+	 * Task 1.2
+	 * Parses comparison expressions following the grammar rule:
+	 * compare ::= addSub ( ( '>' | '<' | '<=' | '>=' | '==' | '!=' ) addSub )*
+	 *
+	 * @return Expression AST node representing the parsed comparison expression
+	 * @throws SyntaxError if the input does not conform to the grammar
+	 * </pre>
+	 */
 	private Expression parseCompare() {
 		SourceLocation location = currentToken.sourceLocation;
 
@@ -519,6 +650,16 @@ public final class Parser {
 		return x;
 	}
 
+	/**
+	 * <pre>
+	 * Task 1.2
+	 * Parses additive expressions following the grammar rule:
+	 * addSub ::= mulDiv (('+' | '-') mulDiv)*
+	 *
+	 * @return Expression AST node representing the parsed additive expression
+	 * @throws SyntaxError if the input does not conform to the grammar
+	 * </pre>
+	 */
 	private Expression parseAddSub() {
         SourceLocation location = currentToken.sourceLocation;
 
@@ -537,6 +678,16 @@ public final class Parser {
         return x;
 	}
 
+	/**
+	 * <pre>
+	 * Task 1.2
+	 * Parses multiplicative expressions following the grammar rule:
+	 * mulDiv ::= unaryMinus ( ( '*' | '/' ) unaryMinus )*
+	 *
+	 * @return Expression AST node representing the parsed multiplicative expression
+	 * @throws SyntaxError if the input does not conform to the grammar
+	 * </pre>
+	 */
 	private Expression parseMulDiv() {
 		SourceLocation location = currentToken.sourceLocation;
 
@@ -555,6 +706,16 @@ public final class Parser {
 		return x;
 	}
 
+	/**
+	 * <pre>
+	 * Task 1.2
+	 * Parses unary minus expressions following the grammar rule:
+	 * unaryMinus ::= '-' ? exponentation
+	 *
+	 * @return Expression AST node representing the parsed unary minus expression
+	 * @throws SyntaxError if the input does not conform to the grammar
+	 * </pre>
+	 */
 	private Expression parseUnaryMinus() {
 		SourceLocation location = currentToken.sourceLocation;
 
@@ -566,6 +727,16 @@ public final class Parser {
 		return parseExponentiation();
 	}
 
+	/**
+	 * <pre>
+	 * Task 1.2
+	 * Parses exponentiation expressions following the grammar rule:
+	 * exponentiation ::= dotProd ( '^' dotProd )*
+	 * 
+	 * @return Expression AST node representing the parsed exponentiation expression
+	 * @throws SyntaxError if the input does not conform to the grammar
+	 * </pre>
+	 */
 	private Expression parseExponentiation() {
 		SourceLocation location = currentToken.sourceLocation;
 
@@ -601,6 +772,16 @@ public final class Parser {
 		return x;
 	}
 
+	/**
+	 * <pre>
+	 * Task 1.2
+	 * Parses transpose expressions following the grammar rule:
+	 * transpose ::= '~' ? dim
+	 *
+	 * @return Expression AST node representing the parsed transpose expression
+	 * @throws SyntaxError if the input does not conform to the grammar
+	 * </pre>
+	 */
 	private Expression parseTranspose() {
 		if(currentToken.type == TRANSPOSE) acceptIt();
 
@@ -669,6 +850,18 @@ public final class Parser {
 		return x;
 	}
 
+	/**
+	 * <pre>
+	 * Task 1.7
+	 * Parses record element selection following the grammar rule:
+	 * recordElementSel ::= atom ( ’@’ ID )?
+	 *
+	 * Parses record field access using dot notation.
+	 *
+	 * @return Expression AST node representing the parsed record element selection
+	 * @throws SyntaxError if the input does not conform to the grammar
+	 * </pre>
+	 */
 	private Expression parseRecordElementSelect() {
 		SourceLocation location = currentToken.sourceLocation;
 		Expression x = parseAtom();
@@ -682,6 +875,22 @@ public final class Parser {
 		return x;
 	}
 
+	/**
+	 * <pre>
+	 * Task 1.6 & 1.7
+	 * Parses atomic expressions following the grammar rule:
+	 * atom ::= INT | FLOAT | BOOL | STRING
+	 *        | ID ( call )?
+	 *        | '(' expr ')'
+	 *        | ('@' ID)? initializerList
+	 *
+	 * Handles literals, identifiers, function calls, parenthesized expressions,
+	 * and initializer lists with optional type annotations.
+	 *
+	 * @return Expression AST node representing the parsed atomic expression
+	 * @throws SyntaxError if the input does not conform to the grammar
+	 * </pre>
+	 */
 	private Expression parseAtom() {
 		SourceLocation location = currentToken.sourceLocation;
 
@@ -747,6 +956,16 @@ public final class Parser {
 		return Float.parseFloat(accept(FLOATLIT));
 	}
 
+	/**
+	 * <pre>
+	 * Task 1.4
+	 * Parses boolean literals following the grammar rule: 
+	 * boolLit ::= 'true' | 'false'
+	 *
+	 * @return BoolLit AST node representing the parsed boolean literal
+	 * @throws SyntaxError if the input does not conform to the grammar
+	 * </pre>
+	 */
 	private boolean parseBoolLit() {
 		return Boolean.parseBoolean(accept(BOOLLIT));
 	}

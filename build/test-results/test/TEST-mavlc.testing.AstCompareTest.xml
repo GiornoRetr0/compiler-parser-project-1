@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="mavlc.testing.AstCompareTest" tests="17" skipped="0" failures="0" errors="0" timestamp="2024-11-20T00:41:49" hostname="Sabas-MacBook-Air.local" time="0.25">
+<testsuite name="mavlc.testing.AstCompareTest" tests="17" skipped="0" failures="0" errors="0" timestamp="2024-11-20T08:29:33" hostname="Sabas-MacBook-Air.local" time="0.245">
   <properties/>
-  <testcase name="test[p1_public/task_7/rec_sel_1]" classname="mavlc.testing.AstCompareTest" time="0.106"/>
+  <testcase name="test[p1_public/task_7/rec_sel_1]" classname="mavlc.testing.AstCompareTest" time="0.099"/>
   <testcase name="test[p1_public/task_7/rec_atom_1]" classname="mavlc.testing.AstCompareTest" time="0.009"/>
   <testcase name="test[p1_public/task_7/rec_dec_1]" classname="mavlc.testing.AstCompareTest" time="0.01"/>
   <testcase name="test[p1_public/task_6/call_1]" classname="mavlc.testing.AstCompareTest" time="0.009"/>
@@ -12,10 +12,10 @@
   <testcase name="test[p1_public/task_1/var_1]" classname="mavlc.testing.AstCompareTest" time="0.008"/>
   <testcase name="test[p1_public/task_4/bool_1]" classname="mavlc.testing.AstCompareTest" time="0.009"/>
   <testcase name="test[p1_public/task_3/if_1]" classname="mavlc.testing.AstCompareTest" time="0.009"/>
-  <testcase name="test[p1_public/task_3/if_2]" classname="mavlc.testing.AstCompareTest" time="0.008"/>
+  <testcase name="test[p1_public/task_3/if_2]" classname="mavlc.testing.AstCompareTest" time="0.009"/>
   <testcase name="test[p1_public/task_2/not_1]" classname="mavlc.testing.AstCompareTest" time="0.009"/>
-  <testcase name="test[p1_public/task_2/arith_1]" classname="mavlc.testing.AstCompareTest" time="0.009"/>
-  <testcase name="test[p1_public/task_2/exp_1]" classname="mavlc.testing.AstCompareTest" time="0.009"/>
+  <testcase name="test[p1_public/task_2/arith_1]" classname="mavlc.testing.AstCompareTest" time="0.01"/>
+  <testcase name="test[p1_public/task_2/exp_1]" classname="mavlc.testing.AstCompareTest" time="0.008"/>
   <testcase name="test[p1_public/task_5/select_2]" classname="mavlc.testing.AstCompareTest" time="0.01"/>
   <testcase name="test[p1_public/task_5/select_1]" classname="mavlc.testing.AstCompareTest" time="0.008"/>
   <system-out><![CDATA[=== Running test case p1_public/task_7/rec_sel_1 ===
